@@ -16,12 +16,18 @@ public class ContaService {
     }
 
     public Conta salvar(Conta conta) {
+        if (conta == null) {
+            throw new Exception("Não podemos salvar elemento nulo");
+        }
         conta.setId(contas.size());
         contas.add(conta);
         return conta;
     }
 
     public Conta buscar(int id) {
+        if (id < 0 || id > contas.size()) {
+            throw new RuntimeException("ID não encontrado");
+        }
         return contas.get(id);
     }
 
