@@ -17,7 +17,7 @@ public class ContaService {
 
     public Conta salvar(Conta conta) {
         if (conta == null) {
-            throw new Exception("Não podemos salvar elemento nulo");
+            throw new RuntimeException("Não podemos salvar elemento nulo");
         }
         conta.setId(contas.size());
         contas.add(conta);

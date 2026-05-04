@@ -29,7 +29,9 @@ class ContaServiceTest {
         Conta conta = new Conta();
         conta.setTitular("Marcelo");
         conta.setSaldo(new BigDecimal("100.00"));
+
         Conta contaSalva = contaService.salvar(conta);
+
         assertNotNull(contaSalva);
         assertEquals(0, contaSalva.getId());
         assertEquals("Marcelo", contaSalva.getTitular());
@@ -41,7 +43,6 @@ class ContaServiceTest {
         Conta conta = new Conta();
         conta.setTitular("Marcelo");
         conta.setSaldo(new BigDecimal("100.00"));
-
         contaService.salvar(conta);
 
         List<Conta> contas = contaService.listar();
@@ -55,7 +56,6 @@ class ContaServiceTest {
         Conta conta = new Conta();
         conta.setTitular("Marcelo");
         conta.setSaldo(new BigDecimal("100.00"));
-
         contaService.salvar(conta);
 
         Conta contaEncontrada = contaService.buscar(0);
@@ -73,12 +73,11 @@ class ContaServiceTest {
 
     @Test
     void test2() {
-        contaService.buscar(10);
+        assertThrows(RuntimeException.class, () -> contaService.buscar(10));
     }
 
     @Test
     void test3() {
-
-        contaService.buscar(-1);
+        assertThrows(RuntimeException.class, () -> contaService.buscar(-1));
     }
 }
