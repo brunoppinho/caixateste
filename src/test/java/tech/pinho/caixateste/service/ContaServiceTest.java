@@ -80,4 +80,27 @@ class ContaServiceTest {
     void test3() {
         assertThrows(RuntimeException.class, () -> contaService.buscar(-1));
     }
+
+    @Test
+    void deveCriarContaComSaldoZero(){
+        String nome = "Marcelo";
+
+        Conta novaConta = contaService.abrirConta(nome);
+
+        assertEquals(nome, novaConta.getTitular());
+        assertEquals(BigDecimal.ZERO, novaConta.getSaldo());
+    }
+
+    @Test
+    void deveNaoCriarContaComNometitualarMaisqueDuasLetras(){
+        String nome = "Ma";
+
+        assertThrows(RuntimeException.class, () -> contaService.abrirConta(nome));
+    }
+    @Test
+    void deveNaoCriarContaComNomeNull(){
+        String nome = null;
+
+        assertThrows(RuntimeException.class, () -> contaService.abrirConta(nome));
+    }
 }

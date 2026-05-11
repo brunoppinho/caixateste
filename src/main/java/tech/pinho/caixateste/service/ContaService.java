@@ -3,6 +3,7 @@ package tech.pinho.caixateste.service;
 import org.springframework.stereotype.Service;
 import tech.pinho.caixateste.domain.Conta;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,4 +32,14 @@ public class ContaService {
         return contas.get(id);
     }
 
+    public Conta abrirConta(String nome) {
+        if (nome == null || nome.length() < 3) {
+            throw new RuntimeException("Nome inválido");
+        }
+        Conta conta = new Conta();
+        conta.setTitular(nome);
+        conta.setSaldo(BigDecimal.ZERO);
+
+        return salvar(conta);
+    }
 }
