@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tech.pinho.caixateste.domain.Conta;
 import tech.pinho.caixateste.service.ContaService;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,14 +55,34 @@ class ContaControllerTest {
     void test_mock_mvc() throws Exception {
         when(contaService.listar()).thenReturn(Collections.emptyList());
 
-        String contas = mvc.perform(
+        mvc.perform(
                         get("/contas")
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0));
 
-        assertEquals("[]", contas);
+        verify(contaService, times(1)).listar();
+        verify(contaService, times(0)).salvar(any());
+    }
+
+    @Test
+    void test_mock_mvc2() throws Exception {
+        Conta conta = new Conta();
+        conta.setTitular("Marcelo");
+        conta.setSaldo(BigDecimal.TEN);
+        when(contaService.listar()).thenReturn(List.of(conta));
+
+        mvc.perform(
+                        get("/contas")
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].titular").value("Marcelo"))
+                .andExpect(jsonPath("$[0].saldo").value(10.0));
+
         verify(contaService, times(1)).listar();
         verify(contaService, times(0)).salvar(any());
     }
