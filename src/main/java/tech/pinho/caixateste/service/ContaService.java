@@ -2,6 +2,7 @@ package tech.pinho.caixateste.service;
 
 import org.springframework.stereotype.Service;
 import tech.pinho.caixateste.domain.Conta;
+import tech.pinho.caixateste.repository.ContaRepository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,26 +11,26 @@ import java.util.List;
 @Service
 public class ContaService {
 
-    private List<Conta> contas = new ArrayList<>();
+    private final ContaRepository contaRepository;
+
+    public ContaService(ContaRepository contaRepository) {
+        this.contaRepository = contaRepository;
+    }
 
     public List<Conta> listar() {
-        return contas;
+        return contaRepository.findAll();
     }
 
     public Conta salvar(Conta conta) {
         if (conta == null) {
             throw new RuntimeException("Não podemos salvar elemento nulo");
         }
-        conta.setId(contas.size());
-        contas.add(conta);
-        return conta;
+        return contaRepository.save(conta);
     }
 
     public Conta buscar(int id) {
-        if (id < 0 || id > contas.size()) {
-            throw new RuntimeException("ID não encontrado");
-        }
-        return contas.get(id);
+        return contaRepository.findById(id)
+                .orElse(null);
     }
 
     public Conta abrirConta(String nome) {

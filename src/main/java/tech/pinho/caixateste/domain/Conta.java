@@ -1,11 +1,20 @@
 package tech.pinho.caixateste.domain;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
+@Entity
 public class Conta {
 
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Integer id;
+
+    @Column(nullable = false)
     private String titular;
+
+    @Column(precision = 10, scale = 2)
     private BigDecimal saldo;
 
     public int getId() {

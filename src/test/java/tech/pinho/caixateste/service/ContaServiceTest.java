@@ -1,22 +1,29 @@
 package tech.pinho.caixateste.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import tech.pinho.caixateste.domain.Conta;
+import tech.pinho.caixateste.repository.ContaRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class ContaServiceTest {
 
+    @InjectMocks
     private ContaService contaService;
 
-    @BeforeEach
-    void setUp() {
-        contaService = new ContaService();
-    }
+    @Mock
+    private ContaRepository contaRepository;
 
     @Test
     void deveListarContasVaziasQuandoNenhumaContaFoiSalva() {
@@ -30,10 +37,11 @@ class ContaServiceTest {
         conta.setTitular("Marcelo");
         conta.setSaldo(new BigDecimal("100.00"));
 
+        when(contaRepository.save(any())).thenReturn(conta);
+
         Conta contaSalva = contaService.salvar(conta);
 
         assertNotNull(contaSalva);
-        assertEquals(0, contaSalva.getId());
         assertEquals("Marcelo", contaSalva.getTitular());
         assertEquals(new BigDecimal("100.00"), contaSalva.getSaldo());
     }
@@ -43,7 +51,7 @@ class ContaServiceTest {
         Conta conta = new Conta();
         conta.setTitular("Marcelo");
         conta.setSaldo(new BigDecimal("100.00"));
-        contaService.salvar(conta);
+        when(contaRepository.findAll()).thenReturn(List.of(conta));
 
         List<Conta> contas = contaService.listar();
 
@@ -56,12 +64,11 @@ class ContaServiceTest {
         Conta conta = new Conta();
         conta.setTitular("Marcelo");
         conta.setSaldo(new BigDecimal("100.00"));
-        contaService.salvar(conta);
+        when(contaRepository.findById(any())).thenReturn(Optional.of(conta));
 
         Conta contaEncontrada = contaService.buscar(0);
 
         assertNotNull(contaEncontrada);
-        assertEquals(0, contaEncontrada.getId());
         assertEquals("Marcelo", contaEncontrada.getTitular());
         assertEquals(new BigDecimal("100.00"), contaEncontrada.getSaldo());
     }
@@ -73,17 +80,16 @@ class ContaServiceTest {
 
     @Test
     void test2() {
-        assertThrows(RuntimeException.class, () -> contaService.buscar(10));
+        assertNull(contaService.buscar(10));
     }
 
     @Test
-    void test3() {
-        assertThrows(RuntimeException.class, () -> contaService.buscar(-1));
-    }
-
-    @Test
-    void deveCriarContaComSaldoZero(){
+    void deveCriarContaComSaldoZero() {
         String nome = "Marcelo";
+        Conta conta = new Conta();
+        conta.setTitular(nome);
+        conta.setSaldo(BigDecimal.ZERO);
+        when(contaRepository.save(any())).thenReturn(conta);
 
         Conta novaConta = contaService.abrirConta(nome);
 
@@ -92,13 +98,14 @@ class ContaServiceTest {
     }
 
     @Test
-    void deveNaoCriarContaComNometitualarMaisqueDuasLetras(){
+    void deveNaoCriarContaComNometitualarMaisqueDuasLetras() {
         String nome = "Ma";
 
         assertThrows(RuntimeException.class, () -> contaService.abrirConta(nome));
     }
+
     @Test
-    void deveNaoCriarContaComNomeNull(){
+    void deveNaoCriarContaComNomeNull() {
         String nome = null;
 
         assertThrows(RuntimeException.class, () -> contaService.abrirConta(nome));
