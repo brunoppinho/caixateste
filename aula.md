@@ -150,3 +150,145 @@ Quando todas as validações passam, o valor é subtraído da origem e somado ao
 - Sem exceção — método `void`
 
 ---
+
+
+
+```
+Teste Unitário:             Teste de Integração:
+
+Service (REAL)              HTTP Request
+    │                           │
+    │ ← mock →                  ▼
+Repository (FALSO)      Controller  (REAL)
+                                │
+                                ▼
+                            Service     (REAL)
+                                │
+                                ▼
+                            Repository  (REAL)
+                                │
+                                ▼
+                            Banco H2    (REAL)
+                                │
+                                ▼
+                            HTTP Response
+```
+
+> "No teste de integração, **tudo é real**. O único componente que substituímos é o banco de produção — e para isso usamos o H2, um banco em memória que se comporta como o PostgreSQL ou MySQL, mas sem instalação, sem porta, sem dado persistido entre execuções."
+
+
+```
+                    ┌─────────────────────┐
+                    │   Testes E2E / UI   │  ← Poucos. Lentos. Caros.
+                    └──────────┬──────────┘
+                    ┌──────────┴──────────┐
+                    │  Testes de          │  ← Alguns. Médios.
+                    │  Integração         │
+                    └──────────┬──────────┘
+          ┌─────────────────────────────────────┐
+          │        Testes Unitários              │  ← Muitos. Rápidos. Baratos.
+          └─────────────────────────────────────┘
+```
+
+> "A base tem o maior volume porque é rápida e barata. Cada teste roda em milissegundos. Você pode ter centenas deles."
+
+> "O meio — testes de integração — são mais lentos (sobem o contexto Spring, inicializam o H2), mas cobrem algo que os unitários não cobrem: a colaboração entre os componentes."
+
+> "O topo — E2E — simula o usuário real no navegador. São os mais lentos e os mais frágeis. Poucos, para fluxos realmente críticos."
+
+### Propriedades de cada camada
+
+| | Unitário | Integração | E2E |
+|---|---|---|---|
+| Velocidade | ⚡ milissegundos | 🕐 segundos | 🕕 minutos |
+| O que usa | Mocks | Banco H2 real | Sistema completo |
+| O que cobre | Uma classe isolada | Fluxo de funcionalidade | Jornada do usuário |
+| Custo de manutenção | Baixo | Médio | Alto |
+| Quantidade ideal | Muitos | Alguns | Poucos |
+
+> "O erro mais comum é a pirâmide invertida: poucos testes unitários e muitos testes de integração. Isso resulta numa suíte lenta, frágil e cara de manter."
+
+### O que cada camada deve cobrir
+
+```
+Testes Unitários:
+├─ Regras de negócio em isolamento (cálculos, validações, condicionais)
+├─ Comportamentos de borda (zero, negativo, null, lista vazia)
+├─ Cada branch de um if/else separadamente
+└─ Cenários de exceção
+
+Testes de Integração:
+├─ Fluxo completo de uma funcionalidade (criar, buscar, atualizar, deletar)
+├─ Interação real entre Service e banco de dados
+├─ Status HTTP correto por endpoint
+└─ Dados persistidos com valores corretos após a operação
+
+Testes E2E:
+├─ Jornada do usuário (login → ação → resultado visível)
+└─ Fluxos críticos de negócio de ponta a ponta
+```
+
+
+```
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+│
+├─ Sobe o contexto COMPLETO do Spring
+├─ Carrega todos os beans: Controllers, Services, Repositories
+├─ RANDOM_PORT: usa porta aleatória → testes rodam em paralelo sem conflito
+└─ Sem mocks — tudo é real
+
+@AutoConfigureMockMvc
+│
+└─ Configura o MockMvc com o contexto completo automaticamente
+   Diferente do standaloneSetup — aqui tudo está conectado de verdade
+
+Resultado: MockMvc real + Spring real + H2 real
+```
+
+### Comparativo: standaloneSetup vs @SpringBootTest
+
+| | `standaloneSetup` (aulas anteriores) | `@SpringBootTest` (hoje) |
+|---|---|---|
+| Tipo de teste | Unitário da Controller | Integração end-to-end |
+| Contexto Spring | ❌ Não sobe | ✅ Sobe completo |
+| Service | Mock | Real |
+| Repository | Não existe | Real |
+| Banco | Não existe | H2 em memória |
+| Velocidade | ⚡ Milissegundos | 🕐 Segundos |
+| Detecta erros de integração | ❌ Não | ✅ Sim |
+
+### Estrutura base de um teste de integração
+
+```java
+@SpringBootTest(
+    classes = ProdutoApplication.class,
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
+@AutoConfigureMockMvc
+public class ProdutoIntegracaoTest {
+
+    @Autowired
+    private MockMvc mockMvc; // configurado pelo Spring — não pelo standaloneSetup
+
+    @Autowired
+    private ProdutoRepository produtoRepository; // repositório real, H2 real
+
+    @BeforeEach
+    public void limparBanco() {
+        produtoRepository.deleteAll(); // garante banco limpo antes de cada teste
+    }
+
+    // Utilitário: converte objeto Java → JSON String
+    public static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+> "Reparem: aqui não tem `@Mock`, não tem `@InjectMocks`. O Spring injeta tudo real. O `@Autowired` nos dá o `MockMvc` já conectado a todos os beans reais."
+
+> "O `@BeforeEach` com `deleteAll()` garante que cada teste começa com o banco vazio. Sem isso, dados de um teste podem afetar o próximo."
