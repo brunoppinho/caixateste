@@ -292,3 +292,39 @@ public class ProdutoIntegracaoTest {
 > "Reparem: aqui não tem `@Mock`, não tem `@InjectMocks`. O Spring injeta tudo real. O `@Autowired` nos dá o `MockMvc` já conectado a todos os beans reais."
 
 > "O `@BeforeEach` com `deleteAll()` garante que cada teste começa com o banco vazio. Sem isso, dados de um teste podem afetar o próximo."
+
+
+### Estratégia 3: `@Sql` para popular o banco com script
+
+**Crie o arquivo `src/test/resources/dados-teste.sql`:**
+
+```sql
+INSERT INTO produto (id, nome, descricao, unidades)
+VALUES (1, 'TV 55', 'TV LED 55 polegadas', 10);
+
+INSERT INTO produto (id, nome, descricao, unidades)
+VALUES (2, 'TV 48', 'TV LCD 48 polegadas', 5);
+```
+
+**Use no teste:**
+
+```java
+@Test
+@Sql("/dados-teste.sql")                         // executa ANTES do teste
+@Sql(scripts = "/limpar.sql",
+     executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD) // executa DEPOIS
+public void listarProdutosComDadosPreCarregados() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/produtos"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(2));
+}
+```
+
+
+### Comparativo das estratégias
+
+| Estratégia | Quando usar | Vantagem | Cuidado |
+|---|---|---|---|
+| `deleteAll()` no `@BeforeEach` | Maioria dos casos | Simples, explícito, confiável | Pode ser lento com muitos dados |
+| `@Transactional` | Testes sem contexto de porta HTTP | Automático, sem código extra | Não funciona bem com `RANDOM_PORT` |
+| `@Sql` | Cenários com dados específicos pré-carregados | Dados de teste versionados em arquivo | Requer manutenção de scripts SQL |
