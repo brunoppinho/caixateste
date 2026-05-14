@@ -70,6 +70,7 @@ class ContaControllerTest {
     @Test
     void test_mock_mvc2() throws Exception {
         Conta conta = new Conta();
+        conta.setId(1);
         conta.setTitular("Marcelo");
         conta.setSaldo(BigDecimal.TEN);
         when(contaService.listar()).thenReturn(List.of(conta));
