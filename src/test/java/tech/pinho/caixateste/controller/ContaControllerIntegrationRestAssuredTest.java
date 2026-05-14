@@ -59,13 +59,13 @@ public class ContaControllerIntegrationRestAssuredTest {
 
     @Test
     void deveListarContas() throws Exception {
-//        mockMvc.perform(
-//                        get("/contas")
-//                                .contentType(MediaType.APPLICATION_JSON)
-//                )
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$").isArray())
-//                .andExpect(jsonPath("$.length()").value(0));
+        given()
+                .when()
+                .get("/contas")
+                .then()
+                .statusCode(200)
+                .body("$.size()", equalTo(0));
+
     }
 
 }
