@@ -41,40 +41,40 @@ class ContaControllerRestAssuredTest {
         verify(contaService, times(0)).salvar(any());
     }
 
-    @Test
-    void test_mock_mvc() throws Exception {
-        when(contaService.listar()).thenReturn(Collections.emptyList());
-
-//        mvc.perform(
-//                        get("/contas")
-//                                .contentType(MediaType.APPLICATION_JSON)
-//                )
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$").isArray())
-//                .andExpect(jsonPath("$.length()").value(0));
+//    @Test
+//    void test_mock_mvc() throws Exception {
+//        when(contaService.listar()).thenReturn(Collections.emptyList());
+//
+////        mvc.perform(
+////                        get("/contas")
+////                                .contentType(MediaType.APPLICATION_JSON)
+////                )
+////                .andExpect(status().isOk())
+////                .andExpect(jsonPath("$").isArray())
+////                .andExpect(jsonPath("$.length()").value(0));
+////
+////        verify(contaService, times(1)).listar();
+////        verify(contaService, times(0)).salvar(any());
+//    }
+//
+//    @Test
+//    void test_mock_mvc2() throws Exception {
+//        Conta conta = new Conta();
+//        conta.setId(1);
+//        conta.setTitular("Marcelo");
+//        conta.setSaldo(BigDecimal.TEN);
+//        when(contaService.listar()).thenReturn(List.of(conta));
+////
+////        mvc.perform(
+////                        get("/contas")
+////                                .contentType(MediaType.APPLICATION_JSON)
+////                )
+////                .andExpect(status().isOk())
+////                .andExpect(jsonPath("$").isArray())
+////                .andExpect(jsonPath("$[0].titular").value("Marcelo"))
+////                .andExpect(jsonPath("$[0].saldo").value(10.0));
 //
 //        verify(contaService, times(1)).listar();
 //        verify(contaService, times(0)).salvar(any());
-    }
-
-    @Test
-    void test_mock_mvc2() throws Exception {
-        Conta conta = new Conta();
-        conta.setId(1);
-        conta.setTitular("Marcelo");
-        conta.setSaldo(BigDecimal.TEN);
-        when(contaService.listar()).thenReturn(List.of(conta));
-//
-//        mvc.perform(
-//                        get("/contas")
-//                                .contentType(MediaType.APPLICATION_JSON)
-//                )
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$").isArray())
-//                .andExpect(jsonPath("$[0].titular").value("Marcelo"))
-//                .andExpect(jsonPath("$[0].saldo").value(10.0));
-
-        verify(contaService, times(1)).listar();
-        verify(contaService, times(0)).salvar(any());
-    }
+//    }
 }

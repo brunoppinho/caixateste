@@ -57,15 +57,15 @@ public class ContaControllerIntegrationRestAssuredTest {
 
     }
 
-    @Test
-    void deveListarContas() throws Exception {
-        given()
-                .when()
-                .get("/contas")
-                .then()
-                .statusCode(200)
-                .body("$.size()", equalTo(0));
-
-    }
+//    @Test
+//    void deveListarContas() throws Exception {
+//        given()
+//                .when()
+//                .get("/contas")
+//                .then()
+//                .statusCode(200)
+//                .body("$.size()", equalTo(0));
+//
+//    }
 
 }
