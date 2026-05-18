@@ -86,6 +86,20 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.14</version>
+
+                <configuration>
+                    <excludes>
+                        <!-- Exclui todas as classes de configuração -->
+                        <exclude>**/config/**</exclude>
+                        <!-- Exclui entidades JPA -->
+                        <exclude>**/domain/**</exclude>
+                        <!-- Exclui DTOs -->
+                        <exclude>**/dto/**</exclude>
+                        <!-- Exclui a classe main -->
+                        <exclude>**/*Application.class</exclude>
+                    </excludes>
+                </configuration>
+
                 <executions>
 
                     <execution>
@@ -131,17 +145,6 @@
                                     </limits>
                                 </rule>
                             </rules>
-
-                            <excludes>
-                                <!-- Exclui todas as classes de configuração -->
-                                <exclude>**/config/**</exclude>
-                                <!-- Exclui entidades JPA -->
-                                <exclude>**/domain/**</exclude>
-                                <!-- Exclui DTOs -->
-                                <exclude>**/dto/**</exclude>
-                                <!-- Exclui a classe main -->
-                                <exclude>**/*Application.class</exclude>
-                            </excludes>
                         </configuration>
                     </execution>
 
