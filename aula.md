@@ -328,3 +328,53 @@ public void listarProdutosComDadosPreCarregados() throws Exception {
 | `deleteAll()` no `@BeforeEach` | Maioria dos casos | Simples, explícito, confiável | Pode ser lento com muitos dados |
 | `@Transactional` | Testes sem contexto de porta HTTP | Automático, sem código extra | Não funciona bem com `RANDOM_PORT` |
 | `@Sql` | Cenários com dados específicos pré-carregados | Dados de teste versionados em arquivo | Requer manutenção de scripts SQL |
+
+
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│   Seu código Java                           │
+│   driver.get("https://google.com")          │
+│   driver.findElement(By.name("q"))          │
+│                  │                          │
+│                  ▼                          │
+│         WebDriver (API)                     │
+│                  │                          │
+│                  ▼                          │
+│         ChromeDriver (binário)              │
+│         chromedriver.exe / chromedriver     │
+│                  │                          │
+│                  ▼                          │
+│         Chrome (navegador real)             │
+│         — abre, clica, preenche —           │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+
+### O que o Selenium consegue fazer
+
+```
+✅ Abrir URLs no navegador
+✅ Clicar em botões, links e elementos
+✅ Preencher campos de formulário
+✅ Selecionar opções em dropdowns
+✅ Verificar texto exibido na página
+✅ Verificar se elementos existem ou estão visíveis
+✅ Navegar entre páginas (voltar, avançar)
+✅ Executar JavaScript na página
+✅ Tirar screenshots
+```
+
+### O ciclo de um teste Selenium
+
+```
+1. Inicializar o driver (abrir o Chrome)
+2. Navegar para a URL
+3. Localizar elementos (By.name, By.id, By.css...)
+4. Interagir com os elementos (click, sendKeys)
+5. Verificar o resultado (assertEquals, assertTrue)
+6. Fechar o driver (driver.quit())
+```
+
+> "O `driver.quit()` é obrigatório — ele fecha o navegador. Se você esquecer, o Chrome vai ficar aberto em segundo plano para sempre durante os testes."
